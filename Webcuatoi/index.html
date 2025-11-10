@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FE Shop – Đồ dùng học tập</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <span class="brand-fe">FE</span><span class="brand-shop">Shop</span>
+      </a>
+      <nav class="nav">
+        <a href="index.html" aria-current="page">Sản phẩm</a>
+        <a href="cart.html">Giỏ hàng (<span id="cart-count">0</span>)</a>
+        <a href="checkout.html">Thanh toán</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="container">
+    <!-- HERO -->
+    <section class="hero text-center">
+      <h1>Đồ dùng học tập chất lượng cao</h1>
+      <p class="muted">Bút, sổ, balo, máy tính – đủ loại cho học sinh, sinh viên</p>
+    </section>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Tìm bút, sổ, balo..." aria-label="Tìm kiếm" />
+      <select id="sort" aria-label="Sắp xếp">
+        <option value="popular">Phổ biến</option>
+        <option value="price-asc">Giá tăng dần</option>
+        <option value="price-desc">Giá giảm dần</option>
+        <option value="name-asc">Tên A→Z</option>
+        <option value="name-desc">Tên Z→A</option>
+      </select>
+    </div>
+
+    <!-- PRODUCT GRID -->
+    <div id="product-grid" class="grid"></div>
+
+    <!-- EMPTY STATE -->
+    <div id="empty-state" class="text-center py-5" style="display: none;">
+      <p class="text-muted fs-4">Không tìm thấy sản phẩm nào.</p>
+      <a href="index.html" class="btn outline">Xem tất cả</a>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container text-center">
+      <p>&copy; <span id="year"></span> FE Shop. Đồ dùng học tập cho mọi lứa tuổi.</p>
+    </div>
+  </footer>
+
+  <!-- JS MODULE -->
+  <script type="module">
+    import { PRODUCTS } from './data/products.js';
+    import { addToCart, initCartCount, seedDemoCart } from './js/cart.js';
+    import { loadProducts, getFilteredSorted, byId, debounce, formatCurrency } from './js/utils.js';
+
+    // Khởi động
+    seedDemoCart(PRODUCTS);
+    initCartCount();
+
+    const grid = byId('product-grid');
+    const emptyState = byId('empty-state');
+    const searchInput = byId('search');
+    const sortSelect = byId('sort');
+
+    // Load + enrich sản phẩm
+    const enriched = loadProducts(PRODUCTS);
+    let filtered = [...enriched];
+
+    // Render sản phẩm với 3 ảnh nhỏ
+    function render(items) {
+      if (items.length === 0) {
+        grid.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+
+      grid.innerHTML = items.map(p => {
+        const mainImg = p.images[0];
+        const disabled = p.stock <= 0 ? 'disabled' : '';
+        const btnText = p.stock <= 0 ? 'Hết hàng' : 'Thêm vào giỏ';
+
+        // Render 3 ảnh nhỏ (nếu có)
+        const thumbs = p.images.slice(1, 4).map(src => 
+          `<img src="${src}" alt="Ảnh phụ" loading="lazy" class="thumb-small">`
+        ).join('');
+        const thumbGrid = thumbs ? `<div class="thumb-grid">${thumbs}</div>` : '';
+
+        return `
+          <article class="card">
+            <a href="product.html?id=${p.id}" class="thumb-main">
+              <img src="${mainImg}" alt="${p.name}" loading="lazy" class="main-thumb">
+            </a>
+            ${thumbGrid}
+            <div class="card-body">
+              <h3 class="title">
+                <a href="product.html?id=${p.id}">${p.name}</a>
+              </h3>
+              <p class="price">${p.priceFmt}</p>
+              <button type="button" class="btn add-to-cart" data-id="${p.id}" ${disabled}>
+                ${btnText}
+              </button>
+            </div>
+          </article>`;
+      }).join('');
+
+      // Gắn sự kiện "Thêm vào giỏ"
+      document.querySelectorAll('.add-to-cart').forEach(btn => {
+        if (btn.disabled) return;
+        btn.addEventListener('click', () => {
+          const id = parseInt(btn.dataset.id);
+          addToCart(id, 1);
+          initCartCount();
+          btn.textContent = 'Đã thêm!';
+          btn.disabled = true;
+          setTimeout(() => {
+            btn.textContent = 'Thêm vào giỏ';
+            btn.disabled = false;
+          }, 1500);
+        });
+      });
+    }
+
+    // Cập nhật lọc + sắp xếp
+    const update = debounce(() => {
+      filtered = getFilteredSorted(enriched, searchInput.value.trim(), sortSelect.value);
+      render(filtered);
+    }, 300);
+
+    // Sự kiện
+    searchInput.addEventListener('input', update);
+    sortSelect.addEventListener('change', update);
+
+    // Khởi tạo
+    render(enriched);
+    byId('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

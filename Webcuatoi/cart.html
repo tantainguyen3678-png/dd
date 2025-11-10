@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FE Shop – Giỏ hàng</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <span class="brand-fe">FE</span><span class="brand-shop">Shop</span>
+      </a>
+      <nav class="nav">
+        <a href="index.html">Sản phẩm</a>
+        <a href="cart.html" aria-current="page">Giỏ hàng (<span id="cart-count">0</span>)</a>
+        <a href="checkout.html">Thanh toán</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="container">
+    <section class="hero text-center">
+      <h1>Giỏ hàng của bạn</h1>
+      <p class="muted">Kiểm tra sản phẩm và tiến hành thanh toán</p>
+    </section>
+
+    <!-- CART TABLE -->
+    <div id="cart-items" class="cart-table"></div>
+
+    <!-- CART SUMMARY -->
+    <div id="cart-summary" class="cart-summary"></div>
+
+    <!-- EMPTY CART -->
+    <div id="empty-cart" class="text-center py-5" style="display: none;">
+      <p class="text-muted fs-4">Giỏ hàng trống</p>
+      <a href="index.html" class="btn">Tiếp tục mua sắm</a>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container text-center">
+      <p>&copy; <span id="year"></span> FE Shop. Đồ dùng học tập chất lượng.</p>
+    </div>
+  </footer>
+
+  <!-- JS MODULE -->
+  <script type="module">
+    import { PRODUCTS } from './data/products.js';
+    import {
+      getCart,
+      removeItem,
+      updateQty,
+      clearCart,
+      initCartCount,
+      cartTotal
+    } from './js/cart.js';
+    import { loadProducts, byId, formatCurrency } from './js/utils.js';
+
+    // Khởi động
+    initCartCount();
+    const cart = getCart();
+    const products = loadProducts(PRODUCTS); // JOIN để lấy hình, giá, tên
+    const itemsContainer = byId('cart-items');
+    const summaryContainer = byId('cart-summary');
+    const emptyCart = byId('empty-cart');
+
+    function render() {
+      if (cart.length === 0) {
+        itemsContainer.innerHTML = '';
+        summaryContainer.innerHTML = '';
+        emptyCart.style.display = 'block';
+        return;
+      }
+
+      emptyCart.style.display = 'none';
+
+      // Render danh sách sản phẩm
+      itemsContainer.innerHTML = `
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Sản phẩm</th>
+              <th>Giá</th>
+              <th>Số lượng</th>
+              <th>Tổng</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${cart.map(item => {
+              const p = products.find(pr => pr.id === item.id);
+              if (!p) return '';
+              const total = p.price * item.qty;
+              return `
+                <tr data-id="${p.id}">
+                  <td class="product-info">
+                    <img src="${p.images[0]}" alt="${p.name}" class="cart-thumb" loading="lazy">
+                    <div>
+                      <a href="product.html?id=${p.id}" class="fw-bold">${p.name}</a>
+                      <small class="text-muted d-block">Còn ${p.stock} sản phẩm</small>
+                    </div>
+                  </td>
+                  <td class="price">${p.priceFmt}</td>
+                  <td>
+                    <input type="number" value="${item.qty}" min="1" max="${p.stock}" 
+                           class="qty-input form-control" ${p.stock <= 0 ? 'disabled' : ''}>
+                  </td>
+                  <td class="total">${formatCurrency(total)}</td>
+                  <td>
+                    <button class="btn danger small remove-btn">Xóa</button>
+                  </td>
+                </tr>`;
+            }).join('')}
+          </tbody>
+        </table>`;
+
+      // Render tổng tiền
+      const subtotal = cartTotal(products);
+      const shipping = 30000;
+      const total = subtotal + shipping;
+
+      summaryContainer.innerHTML = `
+        <div class="summary-card">
+          <h3>Tổng cộng</h3>
+          <div class="summary-row">
+            <span>Tạm tính</span>
+            <strong>${formatCurrency(subtotal)}</strong>
+          </div>
+          <div class="summary-row">
+            <span>Phí vận chuyển</span>
+            <strong>${formatCurrency(shipping)}</strong>
+          </div>
+          <hr>
+          <div class="summary-row total">
+            <span>Thành tiền</span>
+            <strong class="text-danger fs-5">${formatCurrency(total)}</strong>
+          </div>
+          <div class="btn-row mt-3">
+            <a href="checkout.html" class="btn w-100">Tiến hành thanh toán</a>
+            <button id="clear-cart" class="btn outline w-100 mt-2">Xóa giỏ hàng</button>
+          </div>
+        </div>`;
+
+      // Events: Cập nhật số lượng
+      document.querySelectorAll('.qty-input').forEach(input => {
+        input.addEventListener('change', () => {
+          const id = parseInt(input.closest('tr').dataset.id);
+          let qty = parseInt(input.value) || 1;
+          qty = Math.max(1, Math.min(qty, input.max));
+          updateQty(id, qty);
+          initCartCount();
+          render();
+        });
+      });
+
+      // Events: Xóa sản phẩm
+      document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = parseInt(btn.closest('tr').dataset.id);
+          removeItem(id);
+          initCartCount();
+          render();
+        });
+      });
+
+      // Events: Xóa toàn bộ
+      byId('clear-cart').addEventListener('click', () => {
+        if (confirm('Xóa toàn bộ giỏ hàng?')) {
+          clearCart();
+          initCartCount();
+          render();
+        }
+      });
+    }
+
+    render();
+    byId('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
