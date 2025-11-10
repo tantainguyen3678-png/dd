@@ -2,184 +2,404 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FE Shop – Giỏ hàng</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Giỏ hàng</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --secondary: #64748b;
+      --light: #f8fafc;
+      --dark: #1e293b;
+      --danger: #dc2626;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--light);
+      color: var(--dark);
+    }
+    .navbar {
+      background: linear-gradient(135deg, var(--primary), #1d4ed8);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .cart-table th {
+      background-color: #f1f5f9;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    .cart-item-img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid #eee;
+    }
+    .quantity-input {
+      width: 60px;
+      text-align: center;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    .btn-update {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+    .btn-remove {
+      background: var(--danger);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+    .cart-summary {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      position: sticky;
+      top: 100px;
+    }
+    .total-price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .btn-checkout {
+      background: #16a34a;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s;
+    }
+    .btn-checkout:hover {
+      background: #15803d;
+      transform: translateY(-2px);
+    }
+    .empty-cart {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--secondary);
+    }
+    .empty-cart i {
+      font-size: 4rem;
+      color: #cbd5e1;
+      margin-bottom: 20px;
+    }
+    .user-menu .dropdown-toggle {
+      color: white !important;
+      text-decoration: none;
+    }
+    .user-menu .dropdown-toggle::after {
+      display: none;
+    }
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ef4444;
+      color: white;
+      font-size: 0.7rem;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    .footer {
+      background: var(--dark);
+      color: #cbd5e1;
+      padding: 50px 0 20px;
+      margin-top: 80px;
+    }
+    @media (max-width: 768px) {
+      .cart-table {
+        font-size: 0.9rem;
+      }
+      .cart-item-img {
+        width: 60px;
+        height: 60px;
+      }
+      .cart-summary {
+        position: static;
+        margin-top: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <!-- HEADER -->
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="index.html" class="logo">
-        <span class="brand-fe">FE</span><span class="brand-shop">Shop</span>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold fs-4" href="index.html">
+        <i class="fas fa-graduation-cap me-2"></i>Shop Học Tập
       </a>
-      <nav class="nav">
-        <a href="index.html">Sản phẩm</a>
-        <a href="cart.html" aria-current="page">Giỏ hàng (<span id="cart-count">0</span>)</a>
-        <a href="checkout.html">Thanh toán</a>
-      </nav>
+      <div class="ms-auto d-flex align-items-center gap-3">
+        <a href="cart.html" class="text-white position-relative">
+          <i class="fas fa-shopping-cart fs-4"></i>
+          <span id="cart-count" class="cart-count">0</span>
+        </a>
+        <div id="user-menu" style="display: none;">
+          <div class="dropdown">
+            <a class="dropdown-toggle text-white d-flex align-items-center gap-1" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-user"></i>
+              <span id="user-name"></span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#" id="logout">Đăng xuất</a></li>
+            </ul>
+          </div>
+        </div>
+        <a href="login.html" id="login-link" class="btn btn-outline-light">Đăng nhập</a>
+      </div>
     </div>
-  </header>
+  </nav>
 
-  <!-- MAIN -->
-  <main class="container">
-    <section class="hero text-center">
-      <h1>Giỏ hàng của bạn</h1>
-      <p class="muted">Kiểm tra sản phẩm và tiến hành thanh toán</p>
-    </section>
+  <!-- Breadcrumb -->
+  <div class="container mt-4">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html" class="text-decoration-none">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Giỏ hàng</li>
+      </ol>
+    </nav>
+  </div>
 
-    <!-- CART TABLE -->
-    <div id="cart-items" class="cart-table"></div>
+  <!-- Cart Content -->
+  <section class="py-5">
+    <div class="container">
+      <div class="row g-5">
+        <!-- Cart Items -->
+        <div class="col-lg-8">
+          <div id="cart-items">
+            <div class="empty-cart">
+              <i class="fas fa-shopping-cart"></i>
+              <h3>Giỏ hàng trống</h3>
+              <p>Hãy thêm sản phẩm từ trang chủ để bắt đầu mua sắm!</p>
+              <a href="index.html" class="btn btn-primary btn-lg">
+                <i class="fas fa-arrow-left me-2"></i>Tiếp tục mua sắm
+              </a>
+            </div>
+          </div>
+        </div>
 
-    <!-- CART SUMMARY -->
-    <div id="cart-summary" class="cart-summary"></div>
-
-    <!-- EMPTY CART -->
-    <div id="empty-cart" class="text-center py-5" style="display: none;">
-      <p class="text-muted fs-4">Giỏ hàng trống</p>
-      <a href="index.html" class="btn">Tiếp tục mua sắm</a>
+        <!-- Cart Summary -->
+        <div class="col-lg-4">
+          <div class="cart-summary">
+            <h5 class="fw-bold mb-4">Tóm tắt đơn hàng</h5>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Tạm tính (<span id="item-count">0</span> sản phẩm)</span>
+              <span id="subtotal">0₫</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span>Phí vận chuyển</span>
+              <span class="text-success">Miễn phí</span>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between mb-4">
+              <span class="fw-bold">Tổng cộng</span>
+              <span id="total" class="total-price">0₫</span>
+            </div>
+            <a href="checkout.html" class="btn btn-success btn-checkout w-100 d-flex align-items-center justify-content-center gap-2">
+              <i class="fas fa-credit-card"></i> Thanh toán
+            </a>
+            <div class="mt-3 text-center">
+              <small class="text-muted">
+                <i class="fas fa-shield-alt text-success me-1"></i>
+                Thanh toán an toàn – Đảm bảo hoàn tiền
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </main>
+  </section>
 
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="container text-center">
-      <p>&copy; <span id="year"></span> FE Shop. Đồ dùng học tập chất lượng.</p>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <h5><i class="fas fa-graduation-cap me-2"></i>Shop Học Tập</h5>
+          <p>Cung cấp đồ dùng học tập chất lượng cao, giá tốt nhất cho học sinh, sinh viên.</p>
+        </div>
+        <div class="col-md-4 mb-4">
+          <h5>Liên kết</h5>
+          <ul class="list-unstyled">
+            <li><a href="index.html" class="text-light text-decoration-none">Trang chủ</a></li>
+            <li><a href="cart.html" class="text-light text-decoration-none">Giỏ hàng</a></li>
+            <li><a href="login.html" class="text-light text-decoration-none">Đăng nhập</a></li>
+          </ul>
+        </div>
+        <div class="col-md-4 mb-4">
+          <h5>Liên hệ</h5>
+          <p><i class="fas fa-phone me-2"></i>1900 1234</p>
+          <p><i class="fas fa-envelope me-2"></i>shop@hoctap.vn</p>
+          <p><i class="fas fa-map-marker-alt me-2"></i>Hà Nội, Việt Nam</p>
+        </div>
+      </div>
+      <hr class="bg-light">
+      <div class="text-center">
+        <p>&copy; 2025 Shop Học Tập. Tất cả quyền được bảo lưu.</p>
+      </div>
     </div>
   </footer>
 
-  <!-- JS MODULE -->
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script type="module">
-    import { PRODUCTS } from './data/products.js';
-    import {
-      getCart,
-      removeItem,
-      updateQty,
-      clearCart,
-      initCartCount,
-      cartTotal
-    } from './js/cart.js';
-    import { loadProducts, byId, formatCurrency } from './js/utils.js';
+    // === USER AUTH ===
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const userMenu = document.getElementById('user-menu');
+    const loginLink = document.getElementById('login-link');
+    const userName = document.getElementById('user-name');
 
-    // Khởi động
-    initCartCount();
-    const cart = getCart();
-    const products = loadProducts(PRODUCTS); // JOIN để lấy hình, giá, tên
-    const itemsContainer = byId('cart-items');
-    const summaryContainer = byId('cart-summary');
-    const emptyCart = byId('empty-cart');
+    if (currentUser) {
+      userMenu.style.display = 'block';
+      loginLink.style.display = 'none';
+      userName.textContent = currentUser.name.split(' ')[0];
+    }
 
-    function render() {
+    document.getElementById('logout')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      localStorage.removeItem('currentUser');
+      window.location.reload();
+    });
+
+    // === CART FUNCTIONS ===
+    const getCart = () => JSON.parse(localStorage.getItem('cart') || '[]');
+    const saveCart = (cart) => localStorage.setItem('cart', JSON.stringify(cart));
+    const updateCartCount = () => {
+      const cart = getCart();
+      document.getElementById('cart-count').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+    };
+
+    const updateSummary = () => {
+      const cart = getCart();
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      document.getElementById('item-count').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+      document.getElementById('subtotal').textContent = subtotal.toLocaleString('vi-VN') + '₫';
+      document.getElementById('total').textContent = subtotal.toLocaleString('vi-VN') + '₫';
+    };
+
+    const removeFromCart = (id) => {
+      let cart = getCart();
+      cart = cart.filter(item => item.id !== id);
+      saveCart(cart);
+      renderCart();
+      updateCartCount();
+      updateSummary();
+
+      const toast = document.createElement('div');
+      toast.className = 'position-fixed top-0 end-0 p-3';
+      toast.style.zIndex = 9999;
+      toast.innerHTML = `
+        <div class="alert alert-success alert-dismissible fade show shadow-lg">
+          <strong>Đã xóa!</strong> Sản phẩm đã được xóa khỏi giỏ hàng.
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      `;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    };
+
+    const updateQuantity = (id, qty) => {
+      if (qty < 1) return;
+      let cart = getCart();
+      const item = cart.find(i => i.id === id);
+      if (item) {
+        item.quantity = qty;
+        if (qty > item.stock) {
+          item.quantity = item.stock;
+          alert(`Chỉ còn ${item.stock} sản phẩm trong kho!`);
+        }
+        saveCart(cart);
+        renderCart();
+        updateSummary();
+      }
+    };
+
+    const renderCart = () => {
+      const cart = getCart();
+      const cartItems = document.getElementById('cart-items');
+
       if (cart.length === 0) {
-        itemsContainer.innerHTML = '';
-        summaryContainer.innerHTML = '';
-        emptyCart.style.display = 'block';
+        cartItems.innerHTML = `
+          <div class="empty-cart">
+            <i class="fas fa-shopping-cart"></i>
+            <h3>Giỏ hàng trống</h3>
+            <p>Hãy thêm sản phẩm từ trang chủ để bắt đầu mua sắm!</p>
+            <a href="index.html" class="btn btn-primary btn-lg">
+              <i class="fas fa-arrow-left me-2"></i>Tiếp tục mua sắm
+            </a>
+          </div>
+        `;
         return;
       }
 
-      emptyCart.style.display = 'none';
-
-      // Render danh sách sản phẩm
-      itemsContainer.innerHTML = `
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Sản phẩm</th>
-              <th>Giá</th>
-              <th>Số lượng</th>
-              <th>Tổng</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            ${cart.map(item => {
-              const p = products.find(pr => pr.id === item.id);
-              if (!p) return '';
-              const total = p.price * item.qty;
-              return `
-                <tr data-id="${p.id}">
-                  <td class="product-info">
-                    <img src="${p.images[0]}" alt="${p.name}" class="cart-thumb" loading="lazy">
-                    <div>
-                      <a href="product.html?id=${p.id}" class="fw-bold">${p.name}</a>
-                      <small class="text-muted d-block">Còn ${p.stock} sản phẩm</small>
+      cartItems.innerHTML = `
+        <div class="table-responsive">
+          <table class="table cart-table align-middle">
+            <thead>
+              <tr>
+                <th>Sản phẩm</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Tổng</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${cart.map(item => `
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center gap-3">
+                      <img src="${item.images[0]}" alt="${item.name}" class="cart-item-img"
+                           onerror="this.src='https://via.placeholder.com/80x80/eee/999?text=Ảnh'">
+                      <div>
+                        <a href="product.html?id=${item.id}" class="text-dark text-decoration-none fw-500">${item.name}</a>
+                        <small class="text-muted d-block">Còn ${item.stock} sp</small>
+                      </div>
                     </div>
                   </td>
-                  <td class="price">${p.priceFmt}</td>
+                  <td>${item.price.toLocaleString('vi-VN')}₫</td>
                   <td>
-                    <input type="number" value="${item.qty}" min="1" max="${p.stock}" 
-                           class="qty-input form-control" ${p.stock <= 0 ? 'disabled' : ''}>
+                    <div class="d-flex align-items-center gap-2">
+                      <input type="number" class="form-control quantity-input" value="${item.quantity}" min="1" max="${item.stock}"
+                             onchange="updateQuantity(${item.id}, this.value)">
+                    </div>
                   </td>
-                  <td class="total">${formatCurrency(total)}</td>
+                  <td class="fw-bold">${(item.price * item.quantity).toLocaleString('vi-VN')}₫</td>
                   <td>
-                    <button class="btn danger small remove-btn">Xóa</button>
+                    <button class="btn btn-danger btn-remove" onclick="removeFromCart(${item.id})">
+                      <i class="fas fa-trash"></i>
+                    </button>
                   </td>
-                </tr>`;
-            }).join('')}
-          </tbody>
-        </table>`;
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
 
-      // Render tổng tiền
-      const subtotal = cartTotal(products);
-      const shipping = 30000;
-      const total = subtotal + shipping;
+      updateSummary();
+    };
 
-      summaryContainer.innerHTML = `
-        <div class="summary-card">
-          <h3>Tổng cộng</h3>
-          <div class="summary-row">
-            <span>Tạm tính</span>
-            <strong>${formatCurrency(subtotal)}</strong>
-          </div>
-          <div class="summary-row">
-            <span>Phí vận chuyển</span>
-            <strong>${formatCurrency(shipping)}</strong>
-          </div>
-          <hr>
-          <div class="summary-row total">
-            <span>Thành tiền</span>
-            <strong class="text-danger fs-5">${formatCurrency(total)}</strong>
-          </div>
-          <div class="btn-row mt-3">
-            <a href="checkout.html" class="btn w-100">Tiến hành thanh toán</a>
-            <button id="clear-cart" class="btn outline w-100 mt-2">Xóa giỏ hàng</button>
-          </div>
-        </div>`;
-
-      // Events: Cập nhật số lượng
-      document.querySelectorAll('.qty-input').forEach(input => {
-        input.addEventListener('change', () => {
-          const id = parseInt(input.closest('tr').dataset.id);
-          let qty = parseInt(input.value) || 1;
-          qty = Math.max(1, Math.min(qty, input.max));
-          updateQty(id, qty);
-          initCartCount();
-          render();
-        });
-      });
-
-      // Events: Xóa sản phẩm
-      document.querySelectorAll('.remove-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = parseInt(btn.closest('tr').dataset.id);
-          removeItem(id);
-          initCartCount();
-          render();
-        });
-      });
-
-      // Events: Xóa toàn bộ
-      byId('clear-cart').addEventListener('click', () => {
-        if (confirm('Xóa toàn bộ giỏ hàng?')) {
-          clearCart();
-          initCartCount();
-          render();
-        }
-      });
-    }
-
-    render();
-    byId('year').textContent = new Date().getFullYear();
+    // === INIT ===
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCartCount();
+      renderCart();
+    });
   </script>
 </body>
 </html>

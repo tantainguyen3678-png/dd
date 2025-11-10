@@ -2,147 +2,435 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FE Shop – Chi tiết sản phẩm</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tất cả sản phẩm</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --secondary: #64748b;
+      --light: #f8fafc;
+      --dark: #1e293b;
+      --success: #16a34a;
+      --danger: #dc2626;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--light);
+      color: var(--dark);
+    }
+    .navbar {
+      background: linear-gradient(135deg, var(--primary), #1d4ed8);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .sidebar {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      position: sticky;
+      top: 100px;
+      height: fit-content;
+    }
+    .filter-title {
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+    }
+    .form-check-label {
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+    .product-card {
+      transition: all 0.3s ease;
+      border: none;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      background: white;
+    }
+    .product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+    }
+    .product-img {
+      height: 200px;
+      object-fit: cover;
+      border-bottom: 1px solid #eee;
+    }
+    .price {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .btn-add-cart {
+      background: var(--primary);
+      border: none;
+      border-radius: 12px;
+      padding: 8px 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .btn-add-cart:hover {
+      background: #1d4ed8;
+      transform: scale(1.05);
+    }
+    .search-input {
+      border-radius: 12px;
+      padding: 10px 16px;
+      border: 1px solid #ddd;
+    }
+    .sort-select {
+      border-radius: 12px;
+      padding: 8px 12px;
+    }
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ef4444;
+      color: white;
+      font-size: 0.7rem;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    .user-menu .dropdown-toggle {
+      color: white !important;
+      text-decoration: none;
+    }
+    .user-menu .dropdown-toggle::after { display: none; }
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--secondary);
+    }
+    .no-results i {
+      font-size: 3rem;
+      color: #cbd5e1;
+      margin-bottom: 16px;
+    }
+    .footer {
+      background: var(--dark);
+      color: #cbd5e1;
+      padding: 50px 0 20px;
+      margin-top: 80px;
+    }
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    @media (max-width: 992px) {
+      .sidebar {
+        position: static;
+        margin-bottom: 20px;
+      }
+    }
+    @media (max-width: 768px) {
+      .product-img { height: 160px; }
+      .product-card { margin-bottom: 16px; }
+    }
+  </style>
 </head>
 <body>
-  <!-- HEADER -->
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="index.html" class="logo">
-        <span class="brand-fe">FE</span><span class="brand-shop">Shop</span>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold fs-4" href="index.html">
+        <i class="fas fa-graduation-cap me-2"></i>Shop Học Tập
       </a>
-      <nav class="nav">
-        <a href="index.html">Sản phẩm</a>
-        <a href="cart.html">Giỏ hàng (<span id="cart-count">0</span>)</a>
-        <a href="checkout.html">Thanh toán</a>
-      </nav>
+      <div class="ms-auto d-flex align-items-center gap-3">
+        <a href="cart.html" class="text-white position-relative">
+          <i class="fas fa-shopping-cart fs-4"></i>
+          <span id="cart-count" class="cart-count">0</span>
+        </a>
+        <div id="user-menu" style="display: none;">
+          <div class="dropdown">
+            <a class="dropdown-toggle text-white d-flex align-items-center gap-1" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-user"></i><span id="user-name"></span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="orders.html"><i class="fas fa-receipt me-2"></i>Lịch sử đơn hàng</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" id="logout">Đăng xuất</a></li>
+            </ul>
+          </div>
+        </div>
+        <a href="login.html" id="login-link" class="btn btn-outline-light">Đăng nhập</a>
+      </div>
     </div>
-  </header>
+  </nav>
 
-  <!-- MAIN -->
-  <main class="container">
-    <div id="product-detail" class="product-detail"></div>
-  </main>
+  <!-- Breadcrumb -->
+  <div class="container mt-4">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html" class="text-decoration-none">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Tất cả sản phẩm</li>
+      </ol>
+    </nav>
+  </div>
 
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="container text-center">
-      <p>&copy; <span id="year"></span> FE Shop. Đồ dùng học tập chất lượng.</p>
+  <!-- Products Content -->
+  <section class="py-5">
+    <div class="container">
+      <div class="row g-4">
+        <!-- Sidebar Filters -->
+        <div class="col-lg-3">
+          <div class="sidebar">
+            <h5 class="filter-title"><i class="fas fa-filter me-2"></i>Bộ lọc</h5>
+            
+            <!-- Search -->
+            <div class="mb-4">
+              <input type="text" class="form-control search-input" id="searchInput" placeholder="Tìm kiếm sản phẩm...">
+            </div>
+
+            <!-- Category -->
+            <div class="mb-4">
+              <div class="filter-title">Danh mục</div>
+              <div id="categoryFilters"></div>
+            </div>
+
+            <!-- Price Range -->
+            <div class="mb-4">
+              <div class="filter-title">Khoảng giá</div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="priceRange" id="priceAll" value="all" checked>
+                <label class="form-check-label" for="priceAll">Tất cả</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="priceRange" id="price1" value="0-100000">
+                <label class="form-check-label" for="price1">Dưới 100.000₫</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="priceRange" id="price2" value="100000-300000">
+                <label class="form-check-label" for="price2">100.000₫ - 300.000₫</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="priceRange" id="price3" value="300000-500000">
+                <label class="form-check-label" for="price3">300.000₫ - 500.000₫</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="priceRange" id="price4" value="500000">
+                <label class="form-check-label" for="price4">Trên 500.000₫</label>
+              </div>
+            </div>
+
+            <!-- Stock -->
+            <div class="mb-4">
+              <div class="filter-title">Tình trạng</div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="inStock">
+                <label class="form-check-label" for="inStock">Còn hàng</label>
+              </div>
+            </div>
+
+            <button class="btn btn-primary w-100" id="clearFilters">
+              <i class="fas fa-sync me-2"></i>Xóa bộ lọc
+            </button>
+          </div>
+        </div>
+
+        <!-- Product List -->
+        <div class="col-lg-9">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0" id="resultCount">Đang tải...</h4>
+            <select class="form-select sort-select w-auto" id="sortSelect">
+              <option value="name-asc">Tên: A → Z</option>
+              <option value="name-desc">Tên: Z → A</option>
+              <option value="price-asc">Giá: Thấp → Cao</option>
+              <option value="price-desc" selected>Giá: Cao → Thấp</option>
+              <option value="stock-desc">Tồn kho: Cao → Thấp</option>
+            </select>
+          </div>
+
+          <div id="product-list" class="row g-4"></div>
+
+          <div id="no-results" class="no-results" style="display: none;">
+            <i class="fas fa-search"></i>
+            <h5>Không tìm thấy sản phẩm</h5>
+            <p>Thử thay đổi từ khóa hoặc bộ lọc.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <h5><i class="fas fa-graduation-cap me-2"></i>Shop Học Tập</h5>
+          <p>Đồ dùng học tập chất lượng cao – Giá tốt – Giao hàng nhanh</p>
+        </div>
+        <div class="col-md-4 mb-4">
+          <h5>Liên kết</h5>
+          <ul class="list-unstyled">
+            <li><a href="index.html" class="text-light text-decoration-none">Trang chủ</a></li>
+            <li><a href="products.html" class="text-light text-decoration-none">Sản phẩm</a></li>
+            <li><a href="cart.html" class="text-light text-decoration-none">Giỏ hàng</a></li>
+            <li><a href="login.html" class="text-light text-decoration-none">Đăng nhập</a></li>
+          </ul>
+        </div>
+        <div class="col-md-4 mb-4">
+          <h5>Liên hệ</h5>
+          <p><i class="fas fa-phone me-2"></i>1900 1234</p>
+          <p><i class="fas fa-envelope me-2"></i>shop@hoctap.vn</p>
+          <p><i class="fas fa-map-marker-alt me-2"></i>Hà Nội, Việt Nam</p>
+        </div>
+      </div>
+      <hr class="bg-light">
+      <p class="text-center mb-0">&copy; 2025 Shop Học Tập. Tất cả quyền được bảo lưu.</p>
     </div>
   </footer>
 
-  <!-- JS MODULE -->
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script type="module">
     import { PRODUCTS } from './data/products.js';
-    import { addToCart, initCartCount, seedDemoCart } from './js/cart.js';
-    import { loadProducts, byId, formatCurrency, validateQty } from './js/utils.js';
+    import cart from './js/cart.js';
 
-    // Khởi động
-    seedDemoCart(PRODUCTS);
-    initCartCount();
+    // === KHỞI TẠO ===
+    let filteredProducts = [...PRODUCTS];
 
-    const urlParams = new URLSearchParams(location.search);
-    const productId = parseInt(urlParams.get('id')) || 1;
-    const products = loadProducts(PRODUCTS);
-    const product = products.find(p => p.id === productId);
-    const root = byId('product-detail');
+    const productList = document.getElementById('product-list');
+    const resultCount = document.getElementById('resultCount');
+    const noResults = document.getElementById('no-results');
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilters = document.getElementById('categoryFilters');
+    const sortSelect = document.getElementById('sortSelect');
+    const clearFilters = document.getElementById('clearFilters');
 
-    // === KHÔNG TÌM THẤY SẢN PHẨM ===
-    if (!product) {
-      root.innerHTML = `
-        <div class="not-found text-center py-5">
-          <h2 class="text-danger">Không tìm thấy sản phẩm</h2>
-          <p>ID: ${productId} không tồn tại.</p>
-          <a href="index.html" class="btn outline">Về trang chủ</a>
-        </div>`;
-    } else {
-      // === XỬ LÝ ẢNH ===
-      const images = product.images;
-      const mainImage = images[0];
+    // === LẤY DANH MỤC DUY NHẤT ===
+    const categories = [...new Set(PRODUCTS.map(p => p.category))].sort();
 
-      const thumbnails = images.map((src, i) => `
-        <img src="${src}" alt="Ảnh ${i+1}" class="thumbnail-img ${i === 0 ? 'active' : ''}" 
-             data-src="${src}" loading="lazy">
+    // === TẠO CHECKBOX DANH MỤC ===
+    categoryFilters.innerHTML = categories.map(cat => `
+      <div class="form-check">
+        <input class="form-check-input category-filter" type="checkbox" value="${cat}" id="cat-${cat}">
+        <label class="form-check-label" for="cat-${cat}">${cat}</label>
+      </div>
+    `).join('');
+
+    // === LỌC SẢN PHẨM ===
+    const applyFilters = () => {
+      let results = [...PRODUCTS];
+
+      // Tìm kiếm
+      const query = searchInput.value.trim().toLowerCase();
+      if (query) {
+        results = results.filter(p => 
+          p.name.toLowerCase().includes(query) || 
+          p.description.toLowerCase().includes(query)
+        );
+      }
+
+      // Danh mục
+      const selectedCats = Array.from(document.querySelectorAll('.category-filter:checked')).map(cb => cb.value);
+      if (selectedCats.length > 0) {
+        results = results.filter(p => selectedCats.includes(p.category));
+      }
+
+      // Khoảng giá
+      const priceRange = document.querySelector('input[name="priceRange"]:checked').value;
+      if (priceRange !== 'all') {
+        const [min, max] = priceRange === '500000' ? [500000, Infinity] : priceRange.split('-').map(Number);
+        results = results.filter(p => p.price >= min && (max === undefined || p.price <= max));
+      }
+
+      // Còn hàng
+      if (document.getElementById('inStock').checked) {
+        results = results.filter(p => p.stock > 0);
+      }
+
+      filteredProducts = results;
+      sortProducts();
+    };
+
+    // === SẮP XẾP ===
+    const sortProducts = () => {
+      const sortBy = sortSelect.value;
+      filteredProducts.sort((a, b) => {
+        switch (sortBy) {
+          case 'name-asc': return a.name.localeCompare(b.name);
+          case 'name-desc': return b.name.localeCompare(a.name);
+          case 'price-asc': return a.price - b.price;
+          case 'price-desc': return b.price - a.price;
+          case 'stock-desc': return b.stock - a.stock;
+          default: return 0;
+        }
+      });
+      renderProducts();
+    };
+
+    // === HIỂN THỊ SẢN PHẨM ===
+    const renderProducts = () => {
+      if (filteredProducts.length === 0) {
+        productList.innerHTML = '';
+        noResults.style.display = 'block';
+        resultCount.textContent = '0 sản phẩm';
+        return;
+      }
+
+      noResults.style.display = 'none';
+      resultCount.textContent = `${filteredProducts.length} sản phẩm`;
+
+      productList.innerHTML = filteredProducts.map(p => `
+        <div class="col-md-6 col-lg-4">
+          <div class="product-card h-100 d-flex flex-column">
+            <a href="product.html?id=${p.id}" class="text-decoration-none">
+              <img src="${p.images[0]}" alt="${p.name}" class="product-img w-100" loading="lazy"
+                   onerror="this.src='https://via.placeholder.com/300x200/eee/999?text=Ảnh+chưa+có'">
+            </a>
+            <div class="p-3 flex-grow-1 d-flex flex-column">
+              <a href="product.html?id=${p.id}" class="text-decoration-none text-dark">
+                <h6 class="fw-bold mb-2 line-clamp-2">${p.name}</h6>
+              </a>
+              <p class="text-muted small flex-grow-1 mb-2">${p.description}</p>
+              <div class="d-flex justify-content-between align-items-center mt-auto">
+                <div>
+                  <span class="price">${p.price.toLocaleString('vi-VN')}₫</span>
+                  ${p.stock < 10 ? `<br><small class="text-danger"><i class="fas fa-exclamation-triangle"></i> Chỉ còn ${p.stock} sp</small>` : ''}
+                </div>
+                <button class="btn btn-primary btn-add-cart" 
+                        onclick='cart.addToCart(${JSON.stringify(p).replace(/'/g, "\\'")})'
+                        ${p.stock === 0 ? 'disabled' : ''}>
+                  <i class="fas fa-cart-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       `).join('');
+    };
 
-      // === HIỂN THỊ CHI TIẾT ===
-      root.innerHTML = `
-        <div class="detail-grid">
-          <!-- ẢNH -->
-          <div class="img-section">
-            <div class="img-wrap">
-              <img id="mainImage" src="${mainImage}" alt="${product.name}" class="main-img">
-            </div>
-            ${images.length > 1 ? `
-              <div class="thumbnails">
-                ${thumbnails}
-              </div>` : ''
-            }
-          </div>
+    // === SỰ KIỆN ===
+    searchInput.addEventListener('input', applyFilters);
+    document.querySelectorAll('.category-filter, input[name="priceRange"], #inStock').for(clearFilters);
+    sortSelect.addEventListener('change', sortProducts);
+    clearFilters.addEventListener('click', () => {
+      searchInput.value = '';
+      document.querySelectorAll('.category-filter, #inStock').forEach(cb => cb.checked = false);
+      document.getElementById('priceAll').checked = true;
+      applyFilters();
+    });
 
-          <!-- THÔNG TIN -->
-          <div class="info">
-            <h1>${product.name}</h1>
-            <p class="price text-danger fw-bold">${product.priceFmt}</p>
-            <p class="stock ${product.stock > 0 ? 'text-success' : 'text-danger'}">
-              ${product.stock > 0 
-                ? `Còn lại: <strong>${product.stock}</strong> sản phẩm` 
-                : '<strong>Hết hàng</strong>'
-              }
-            </p>
-            <p class="text-muted lh-lg">${product.description}</p>
-
-            <!-- SỐ LƯỢNG -->
-            <div class="qty-row">
-              <label for="qty">Số lượng:</label>
-              <input id="qty" type="number" min="1" max="${product.stock}" value="1" 
-                     class="form-control" ${product.stock <= 0 ? 'disabled' : ''}>
-            </div>
-
-            <!-- NÚT HÀNH ĐỘNG -->
-            <div class="btn-row">
-              <button id="addToCartBtn" class="btn" ${product.stock <= 0 ? 'disabled' : ''}>
-                Thêm vào giỏ hàng
-              </button>
-              <a href="cart.html" class="btn outline">Xem giỏ</a>
-            </div>
-          </div>
-        </div>`;
-
-      // === THAY ĐỔI ẢNH KHI CLICK THUMBNAIL ===
-      document.querySelectorAll('.thumbnail-img').forEach(thumb => {
-        thumb.addEventListener('click', () => {
-          const main = byId('mainImage');
-          main.src = thumb.dataset.src;
-          document.querySelectorAll('.thumbnail-img').forEach(t => t.classList.remove('active'));
-          thumb.classList.add('active');
-        });
-      });
-
-      // === THÊM VÀO GIỎ HÀNG ===
-      byId('addToCartBtn').addEventListener('click', () => {
-        const qtyInput = byId('qty');
-        const qty = validateQty(qtyInput.value, product.stock);
-        qtyInput.value = qty;
-
-        addToCart(product.id, qty);
-        initCartCount();
-
-        // Hiệu ứng
-        const btn = byId('addToCartBtn');
-        btn.textContent = `Đã thêm ${qty}!`;
-        btn.disabled = true;
-        setTimeout(() => {
-          btn.textContent = 'Thêm vào giỏ hàng';
-          btn.disabled = product.stock <= 0;
-        }, 1500);
-      });
-    }
-
-    // Footer năm
-    byId('year').textContent = new Date().getFullYear();
+    // === KHỞI TẠO ===
+    document.addEventListener('DOMContentLoaded', () => {
+      cart.updateCartCount();
+      cart.updateUserMenu();
+      applyFilters();
+    });
   </script>
 </body>
 </html>

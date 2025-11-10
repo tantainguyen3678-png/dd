@@ -1,7 +1,7 @@
 // data/products.js
 // 50 sản phẩm đồ dùng học tập – DỄ THAY ẢNH BẰNG TAY
 // images: [ảnh lớn, ảnh nhỏ 1, ảnh nhỏ 2, ảnh nhỏ 3]
-// Dùng ảnh placeholder cố định – bạn chỉ cần thay link
+// Dùng ảnh placeholder cố định – bạn chỉ cần bỏ ảnh vào thư mục images/products/
 
 const IMG = (name) => `images/products/${name}.jpg`; // Dễ thay: chỉ cần bỏ ảnh vào thư mục images/products/
 
@@ -20,8 +20,8 @@ export const PRODUCTS = [
     price: 5000,
     stock: 100,
     images: [
-      IMG("https://product.hstatic.net/1000230347/product/gel-b01_copy_0b62e9848a9048b6832fab327aedcece.jpg"),
       IMG("https://product.hstatic.net/200000280811/product/but-gel-thien-long-gel-b01-muc-den-02_82dd350765284165b0e30cf07bbfd063_617fffe029ab483e9297438d2720432d_master.jpg"),
+      IMG("but-bi-thien-long-1"),
       IMG("but-bi-thien-long-2"),
       IMG("but-bi-thien-long-3")
     ],
